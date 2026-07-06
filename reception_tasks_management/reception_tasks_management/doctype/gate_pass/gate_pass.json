@@ -42,12 +42,14 @@
   {
    "fieldname": "handover_tofrom",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Handover To/From",
    "options": "Reception Person"
   },
   {
    "fieldname": "handover_place",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Handover Place",
    "options": "Reception Person"
   },
@@ -98,7 +100,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-06 16:14:38.608986",
+ "modified": "2026-07-06 16:36:23.757982",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass",
