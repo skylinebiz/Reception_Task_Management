@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "GP.-.YYYY.-.#####",
+ "creation": "2026-07-06 12:48:30.524571",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "column_break_ptur",
+  "direction",
+  "handover_section",
+  "handover_tofrom",
+  "referance",
+  "return_date",
+  "column_break_wqqy",
+  "handover_place",
+  "is_returnable",
+  "return_remarks",
+  "items_section",
+  "items"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "column_break_ptur",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Direction",
+   "options": "IN\nOUT",
+   "reqd": 1
+  },
+  {
+   "fieldname": "handover_tofrom",
+   "fieldtype": "Link",
+   "label": "Handover To/From",
+   "options": "Reception Person"
+  },
+  {
+   "fieldname": "handover_place",
+   "fieldtype": "Link",
+   "label": "Handover Place",
+   "options": "Reception Person"
+  },
+  {
+   "fieldname": "referance",
+   "fieldtype": "Data",
+   "label": "Referance"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_returnable",
+   "fieldtype": "Check",
+   "label": "Is Returnable?"
+  },
+  {
+   "fieldname": "handover_section",
+   "fieldtype": "Section Break",
+   "label": "Handover"
+  },
+  {
+   "fieldname": "column_break_wqqy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.is_returnable",
+   "fieldname": "return_date",
+   "fieldtype": "Datetime",
+   "label": "Return Date"
+  },
+  {
+   "depends_on": "eval:doc.is_returnable",
+   "fieldname": "return_remarks",
+   "fieldtype": "Data",
+   "label": "Return Remarks"
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Gate Pass Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-06 16:14:38.608986",
+ "modified_by": "Administrator",
+ "module": "Reception Tasks Management",
+ "name": "Gate Pass",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
