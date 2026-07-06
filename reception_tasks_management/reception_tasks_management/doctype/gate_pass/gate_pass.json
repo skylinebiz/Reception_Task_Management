@@ -18,7 +18,8 @@
   "is_returnable",
   "return_remarks",
   "items_section",
-  "items"
+  "items",
+  "amended_from"
  ],
  "fields": [
   {
@@ -95,12 +96,23 @@
    "fieldtype": "Table",
    "label": "Items",
    "options": "Gate Pass Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Gate Pass",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2026-07-06 16:36:23.757982",
+ "modified": "2026-07-06 17:42:07.595440",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass",
