@@ -48,9 +48,8 @@
   },
   {
    "fieldname": "return_reference",
-   "fieldtype": "Link",
-   "label": "Return Reference",
-   "options": "Gate Pass Item"
+   "fieldtype": "Data",
+   "label": "Return Reference"
   },
   {
    "default": "0",
@@ -83,7 +82,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-07-06 17:27:12.794986",
+ "modified": "2026-07-07 11:32:32.376950",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass Item",

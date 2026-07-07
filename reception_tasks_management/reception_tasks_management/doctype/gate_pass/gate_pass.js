@@ -111,17 +111,11 @@ function open_get_items_dialog(frm) {
                 options: ["IN", "OUT"],
                 default: search_direction,
                 reqd: 1,
-                // change() {
-                //     load_items();
-                // }
             },
             {
                 fieldname: "search",
                 fieldtype: "Data",
                 label: __("Search"),
-                // change() {
-                //     load_items();
-                // }
             },
             {
                 fieldname: "items",
@@ -136,7 +130,8 @@ function open_get_items_dialog(frm) {
                         options: "Gate Pass",
                         read_only: 1,
                         in_list_view: 1,
-                        label: "Gate Pass"
+                        label: "Gate Pass",
+                        columns: 2
                     },
                     {
                         fieldname: "item",
@@ -144,57 +139,49 @@ function open_get_items_dialog(frm) {
                         options: "Item",
                         read_only: 1,
                         in_list_view: 1,
-                        label: "Item"
+                        label: "Item",
+                        columns: 2
                     },
                     {
-                        fieldname: "handover_tofrom",
+                        fieldname: "handover_name",
                         fieldtype: "Data",
                         label: "Handover To/From",
                         read_only: 1,
-                        in_list_view: 1
+                        in_list_view: 1,
+                        columns: 2
                     },
                     {
                         fieldname: "handover_address",
                         fieldtype: "Data",
                         label: "Place",
                         read_only: 1,
-                        in_list_view: 1
+                        in_list_view: 1,
+                        columns: 2
                     },
                     {
                         fieldname: "date",
                         fieldtype: "Date",
                         label: "Date",
                         read_only: 1,
-                        in_list_view: 1
+                        in_list_view: 1,
+                        columns: 2
                     },
-                    // {
-                    // 	fieldname: "item_uuid",
-                    // 	fieldtype: "Data",
-                    // 	read_only: 1,
-                    // 	in_list_view: 1,
-                    // 	label: "Reference"
-                    // },
                     {
                         fieldname: "return_qty",
                         fieldtype: "Float",
                         label: "Return Qty",
                         in_list_view: 1,
-                        default: 0
+                        default: 0,
+                        columns: 2
                     },
                     {
                         fieldname: "pending_qty",
                         fieldtype: "Float",
                         label: "Pending Qty",
                         read_only: 1,
-                        in_list_view: 1
+                        in_list_view: 1,
+                        columns: 2
                     },
-                    // {
-                    //     fieldname: "returned_qty",
-                    //     fieldtype: "Float",
-                    //     label: "Returned",
-                    //     read_only: 1,
-                    //     in_list_view: 1
-                    // }
                 ]
             }
         ],
@@ -227,6 +214,8 @@ function open_get_items_dialog(frm) {
             const items = [];
 
             rows.forEach(r => {
+                // console.log(r);
+
                 const qty = flt(r.return_qty);
 
                 if (!qty) return;
