@@ -105,24 +105,11 @@ function open_get_items_dialog(frm) {
         size: "extra-large",
         fields: [
             {
-                fieldname: "direction",
-                fieldtype: "Select",
-                label: __("Direction"),
-                options: ["IN", "OUT"],
-                default: search_direction,
-                reqd: 1,
-            },
-            {
-                fieldname: "search",
-                fieldtype: "Data",
-                label: __("Search"),
-            },
-            {
                 fieldname: "items",
                 fieldtype: "Table",
                 label: __("Returnable Items"),
                 cannot_add_rows: true,
-                in_place_edit: true,
+                in_place_edit: false,
                 fields: [
                     {
                         fieldname: "gate_pass",
@@ -135,8 +122,7 @@ function open_get_items_dialog(frm) {
                     },
                     {
                         fieldname: "item",
-                        fieldtype: "Link",
-                        options: "Item",
+                        fieldtype: "Data",
                         read_only: 1,
                         in_list_view: 1,
                         label: "Item",
@@ -167,11 +153,11 @@ function open_get_items_dialog(frm) {
                         columns: 2
                     },
                     {
-                        fieldname: "return_qty",
+                        fieldname: "qty",
                         fieldtype: "Float",
-                        label: "Return Qty",
+                        label: "Challan Qty",
+                        read_only: 1,
                         in_list_view: 1,
-                        default: 0,
                         columns: 2
                     },
                     {
@@ -180,6 +166,14 @@ function open_get_items_dialog(frm) {
                         label: "Pending Qty",
                         read_only: 1,
                         in_list_view: 1,
+                        columns: 2
+                    },
+                    {
+                        fieldname: "return_qty",
+                        fieldtype: "Float",
+                        label: "Return Qty",
+                        in_list_view: 1,
+                        default: 0,
                         columns: 2
                     },
                 ]
@@ -193,7 +187,7 @@ function open_get_items_dialog(frm) {
             frappe.call({
                 method: "reception_tasks_management.api.gatepass.get_pending_return_items",
                 args: {
-                    direction: dialog.get_value("direction"),
+                    direction: search_direction,
                     search: dialog.get_value("search")
                 },
                 callback(r) {
@@ -205,7 +199,7 @@ function open_get_items_dialog(frm) {
 
         },
 
-        secondary_action_label: __("Make Gate Pass"),
+        secondary_action_label: __("Populate"),
 
         secondary_action() {
 
@@ -231,7 +225,7 @@ function open_get_items_dialog(frm) {
                     qty: qty,
                     pending_qty: r.pending_qty,
                     return_reference: r.item_uuid,
-                    is_returnable: r.is_returnable
+                    // is_returnable: r.is_returnable
                 });
             });
 
@@ -242,8 +236,7 @@ function open_get_items_dialog(frm) {
 
             const doc = frappe.model.get_new_doc("Gate Pass");
 
-            doc.direction = dialog.get_value("direction");
-
+            doc.direction = frm.doc.direction;
             items.forEach(d => {
                 const row = frappe.model.add_child(doc, "Gate Pass Item", "items");
 
@@ -251,7 +244,7 @@ function open_get_items_dialog(frm) {
                 row.qty = d.qty;
                 row.pending_qty = d.pending_qty;
                 row.return_reference = d.return_reference;
-                row.is_returnable = d.is_returnable;
+                // row.is_returnable = d.is_returnable;
             });
 
             dialog.hide();
