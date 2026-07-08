@@ -27,56 +27,19 @@ frappe.ui.form.on("Gate Pass", {
     refresh(frm) {
         update_handover_section(frm);
 
-        frm.add_custom_button(__("Get Returnable Items"), () => {
-            open_get_items_dialog(frm);
-        });
+        if (frm.is_new()) {
 
-        populate_route_items(frm);
+            frm.add_custom_button(__("Get Returnable Items"), () => {
+                open_get_items_dialog(frm);
+            });
+        }
+
     },
 
     direction(frm) {
         update_handover_section(frm);
     }
 });
-
-function populate_route_items(frm) {
-    console.log('populating items');
-
-    if (!frm.is_new()) return;
-
-    if (frm.__route_items_loaded) return;
-
-    if (!frappe.route_options?.return_items) return;
-
-    frm.__route_items_loaded = true;
-
-    const route = frappe.route_options;
-    console.log(route);
-
-    if (route.direction) {
-        frm.set_value("direction", route.direction);
-    }
-
-    const items = JSON.parse(route.return_items);
-
-    console.log(items);
-
-    frm.clear_table("items");
-
-    items.forEach(d => {
-        const row = frm.add_child("items");
-
-        row.item = d.item;
-        row.qty = d.qty;
-        row.pending_qty = d.pending_qty;
-        row.return_reference = d.return_reference;
-        row.is_returnable = d.is_returnable;
-    });
-
-    frm.refresh_field("items");
-
-    frappe.route_options = null;
-}
 
 function update_handover_section(frm) {
     const sections = ["handover_section", "items_section"];
@@ -254,32 +217,4 @@ function open_get_items_dialog(frm) {
     });
 
     dialog.show();
-}
-
-function add_items_to_current_gate_pass() {
-
-    const rows = dialog.fields_dict.items.grid.get_data();
-
-    rows.forEach(r => {
-
-        const qty = flt(r.return_qty);
-
-        if (!qty) return;
-
-        if (qty > r.pending_qty) {
-            frappe.throw(
-                __("Return Qty for {0} cannot exceed Pending Qty.", [r.item])
-            );
-        }
-
-        let row = frm.add_child("items");
-
-        row.item = r.item;
-        row.qty = qty;
-        row.return_reference = r.item_uuid;
-        row.is_returnable = r.is_returnable;
-    });
-
-    frm.refresh_field("items");
-    dialog.hide();
 }
