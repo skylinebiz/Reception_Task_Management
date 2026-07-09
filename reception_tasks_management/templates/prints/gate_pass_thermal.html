@@ -103,7 +103,7 @@
 
     <div class="ticket">
 
-        {% set company = frappe.get_doc("Company", "Arihant Enterprise") %}
+        {% set company = frappe.get_doc("Company", "Arihant Enterprises") %}
         {% set address_name = frappe.contacts.doctype.address.address.get_default_address("Company", company.name) %}
         {% set address = frappe.get_doc("Address", address_name) if address_name else None %}
 
