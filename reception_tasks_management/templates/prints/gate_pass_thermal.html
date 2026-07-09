@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <style>
+        @page {
+            margin: 2mm;
+        }
+
+        html,
+        body {
+            width: 78mm;
+            margin: 0;
+            padding: 0;
+            font-family: "Courier New", monospace;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
+        .ticket {
+            width: 74mm;
+            margin: 0 auto;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #000;
+            margin: 1px 0;
+            padding: 0;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .subtitle {
+            font-size: 10px;
+        }
+
+        .timestamp {
+            font-size: 9px;
+            margin-top: 3px;
+            margin-bottom: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .info-table {
+            font-size: 9px;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+
+        .info-table td {
+            padding: 1px 0;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        .info-table td:first-child {
+            width: 32%;
+            font-weight: bold;
+        }
+
+        .items-table {
+            font-size: 9px;
+        }
+
+        .items-table th {
+            border-bottom: 1px solid #000;
+            text-align: left;
+            padding: 2px 0;
+        }
+
+        .items-table td {
+            padding: 2px 0;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        .items-table th:nth-child(2),
+        .items-table th:nth-child(3),
+        .items-table th:nth-child(4),
+        .items-table td:nth-child(2),
+        .items-table td:nth-child(3),
+        .items-table td:nth-child(4) {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="ticket">
+
+    {% set company = frappe.get_doc("Company", "Arihant Enterprise") %}
+
+    <div class="center" style="font-size:16px;font-weight:bold;">
+        {{ company.company_name }}
+    </div>
+
+    <hr>
+
+    <div class="center subtitle">
+        MANUFACTURERS OF MEN'S ETHNIC WEAR
+    </div>
+
+    <hr>
+
+    <div class="center">
+        H-1-101 (B), RIICO IND. AREA, MANSAROVAR,
+    </div>
+
+    <div class="center">
+        JAIPUR-302020 (RAJASTHAN)
+    </div>
+
+    <div class="center">
+        Phone-0141-2395790/91
+    </div>
+
+    <div class="right timestamp">
+        <b>TIMESTAMP:</b>
+        {{ frappe.utils.format_datetime(doc.creation, "dd/MM/yyyy HH:mm:ss") }}
+    </div>
+
+    <div class="center" style="font-size:12px;margin-bottom:5px;">
+        <b><u>CHALLAN / GATE PASS</u></b>
+    </div>
+
+    {% set handover_to = frappe.get_doc("Reception Person", doc.handover_tofrom) if doc.handover_tofrom else None %}
+    {% set handover_place = frappe.get_doc("Reception Person", doc.handover_place) if doc.handover_place else None %}
+
+    <table class="info-table">
+
+        <tr>
+            <td>Made By</td>
+            <td>{{ doc.owner_name or doc.owner }}</td>
+        </tr>
+
+        <tr>
+            <td>GP No</td>
+            <td>{{ doc.name }}</td>
+        </tr>
+
+        <tr>
+            <td>Handover To</td>
+            <td>{{ handover_to.full_name if handover_to else "" }}</td>
+        </tr>
+
+        <tr>
+            <td>Address</td>
+            <td>{{ handover_place.address if handover_place else "" }}</td>
+        </tr>
+
+    </table>
+
+    <table class="items-table">
+
+        <thead>
+
+            <tr>
+                <th style="width:58%;">ITEM</th>
+                <th style="width:12%;">QTY</th>
+                <th style="width:20%;">REF</th>
+                <th style="width:10%;">RET</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in doc.items %}
+
+            <tr>
+                <td>{{ row.item }}</td>
+                <td>{{ row.qty|int }}</td>
+                <td>{{ row.remarks or "" }}</td>
+                <td>{{ "Y" if row.is_returnable else "N" }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

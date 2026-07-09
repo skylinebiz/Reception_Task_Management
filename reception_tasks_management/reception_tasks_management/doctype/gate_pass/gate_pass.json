@@ -12,11 +12,8 @@
   "handover_section",
   "handover_tofrom",
   "referance",
-  "return_date",
   "column_break_wqqy",
   "handover_place",
-  "is_returnable",
-  "return_remarks",
   "items_section",
   "items",
   "amended_from"
@@ -60,12 +57,6 @@
    "label": "Referance"
   },
   {
-   "default": "0",
-   "fieldname": "is_returnable",
-   "fieldtype": "Check",
-   "label": "Is Returnable?"
-  },
-  {
    "fieldname": "handover_section",
    "fieldtype": "Section Break",
    "label": "Handover"
@@ -73,18 +64,6 @@
   {
    "fieldname": "column_break_wqqy",
    "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.is_returnable",
-   "fieldname": "return_date",
-   "fieldtype": "Datetime",
-   "label": "Return Date"
-  },
-  {
-   "depends_on": "eval:doc.is_returnable",
-   "fieldname": "return_remarks",
-   "fieldtype": "Data",
-   "label": "Return Remarks"
   },
   {
    "fieldname": "items_section",
@@ -112,7 +91,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-06 17:42:07.595440",
+ "modified": "2026-07-09 15:27:58.244827",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass",
