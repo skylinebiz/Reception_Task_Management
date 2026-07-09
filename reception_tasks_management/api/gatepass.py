@@ -55,54 +55,12 @@ def get_pending_return_items(direction, search=None):
     """, filters, as_dict=True)
 
 
-# @frappe.whitelist()
-# def download_gate_pass_pdf(name):
-#     doc = frappe.get_doc("Gate Pass", name)
-
-#     # Estimate page height
-#     base_height = 85      # Header + footer
-#     row_height = 7        # mm per item
-#     page_height = base_height + (len(doc.items) * row_height)
-
-#     html = render_template(
-#         "reception_tasks_management/templates/prints/gate_pass_thermal.html",
-#         {
-#             "doc": doc,
-#             "frappe": frappe,
-#         },
-#     )
-
-#     pdf = get_pdf(
-#         html,
-#         options={
-#             "page-width": "78mm",
-#             "page-height": f"{page_height}mm",
-#             "margin-top": "2mm",
-#             "margin-bottom": "2mm",
-#             "margin-left": "2mm",
-#             "margin-right": "2mm",
-#             "disable-smart-shrinking": "",
-#             "print-media-type": "",
-#             "encoding": "UTF-8",
-#         },
-#     )
-
-#     # frappe.local.response.filename = f"{name}.pdf"
-#     # frappe.local.response.filecontent = pdf
-#     # frappe.local.response.type = "download"
-#     frappe.local.response.filename = f"{name}.pdf"
-#     frappe.local.response.filecontent = pdf
-#     frappe.local.response.type = "binary"
-#     frappe.local.response.headers["Content-Type"] = "application/pdf"
-#     frappe.local.response.headers["Content-Disposition"] = f'inline; filename="{name}.pdf"'
-
 @frappe.whitelist()
 def download_gate_pass_pdf(name):
     doc = frappe.get_doc("Gate Pass", name)
 
-    base_height = 60
-    row_height = 6
-    # page_height = base_height + (len(doc.items) * row_height)
+    base_height = 70
+    row_height = 5
     page_height = base_height + len(doc.items) * row_height + 10
 
     html = render_template(
@@ -116,12 +74,12 @@ def download_gate_pass_pdf(name):
     pdf = get_pdf(
         html,
         options={
-            "page-width": "80mm",
+            "page-width": "78mm",
             "page-height": f"{page_height}mm",
             "margin-top": "2mm",
-            "margin-bottom": "2mm",
+            "margin-bottom": "0.5mm",
             "margin-left": "2mm",
-            "margin-right": "2mm",
+            "margin-right": "0.5mm",
         },
     )
 
