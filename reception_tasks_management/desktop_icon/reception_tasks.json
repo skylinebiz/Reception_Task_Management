@@ -1,0 +1,21 @@
+{
+ "app": "reception_tasks_management",
+ "bg_color": "gray",
+ "creation": "2026-07-09 15:51:16.070394",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon_type": "App",
+ "idx": 0,
+ "label": "Reception Tasks",
+ "link_to": "Reception Task Management",
+ "link_type": "Workspace Sidebar",
+ "modified": "2026-07-09 15:52:49.920045",
+ "modified_by": "Administrator",
+ "name": "Reception Tasks",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "sidebar": "Reception Task Management",
+ "standard": 1
+}

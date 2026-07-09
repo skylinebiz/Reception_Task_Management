@@ -1,5 +1,9 @@
 import frappe
 from frappe import _
+from frappe.utils.pdf import get_pdf
+from frappe.utils.jinja import render_template
+from werkzeug.wrappers import Response
+
 
 @frappe.whitelist()
 def get_pending_return_items(direction, search=None):
@@ -49,3 +53,40 @@ def get_pending_return_items(direction, search=None):
             {condition}
         ORDER BY gp.modified DESC
     """, filters, as_dict=True)
+
+
+@frappe.whitelist()
+def download_gate_pass_pdf(name):
+    doc = frappe.get_doc("Gate Pass", name)
+
+    base_height = 70
+    row_height = 5
+    page_height = base_height + len(doc.items) * row_height + 10
+
+    html = render_template(
+        "reception_tasks_management/templates/prints/gate_pass_thermal.html",
+        {
+            "doc": doc,
+            "frappe": frappe,
+        },
+    )
+
+    pdf = get_pdf(
+        html,
+        options={
+            "page-width": "78mm",
+            "page-height": f"{page_height}mm",
+            "margin-top": "2mm",
+            "margin-bottom": "0.5mm",
+            "margin-left": "2mm",
+            "margin-right": "0.5mm",
+        },
+    )
+
+    return Response(
+        pdf,
+        mimetype="application/pdf",
+        headers={
+            "Content-Disposition": f'inline; filename="{name}.pdf"'
+        },
+    )

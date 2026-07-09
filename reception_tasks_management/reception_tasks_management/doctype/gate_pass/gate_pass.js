@@ -34,6 +34,15 @@ frappe.ui.form.on("Gate Pass", {
             });
         }
 
+         if (!frm.is_new()) {
+            frm.add_custom_button(__("Download Thermal PDF"), function () {
+                const url =
+                    `/api/method/reception_tasks_management.api.gatepass.download_gate_pass_pdf?name=${encodeURIComponent(frm.doc.name)}`;
+
+                window.open(url);
+            });
+        }
+
     },
 
     direction(frm) {
