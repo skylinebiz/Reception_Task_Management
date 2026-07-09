@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
 
@@ -100,101 +101,116 @@
 
 <body>
 
-<div class="ticket">
+    <div class="ticket">
 
-    {% set company = frappe.get_doc("Company", "Arihant Enterprise") %}
+        {% set company = frappe.get_doc("Company", "Arihant Enterprise") %}
+        {% set address_name = frappe.contacts.doctype.address.address.get_default_address("Company", company.name) %}
+        {% set address = frappe.get_doc("Address", address_name) if address_name else None %}
 
-    <div class="center" style="font-size:16px;font-weight:bold;">
-        {{ company.company_name }}
-    </div>
 
-    <hr>
+        <div class="center" style="font-size:16px;font-weight:bold;">
+            {{ company.company_name }}
+        </div>
 
-    <div class="center subtitle">
-        MANUFACTURERS OF MEN'S ETHNIC WEAR
-    </div>
+        <hr>
 
-    <hr>
+        <div class="center subtitle">
+            MANUFACTURERS OF MEN'S ETHNIC WEAR
+        </div>
 
-    <div class="center">
-        H-1-101 (B), RIICO IND. AREA, MANSAROVAR,
-    </div>
+        <hr>
 
-    <div class="center">
-        JAIPUR-302020 (RAJASTHAN)
-    </div>
+        {% if address %}
+        {% if address.address_line1 %}
+        <div class="center">{{ address.address_line1 }}</div>
+        {% endif %}
 
-    <div class="center">
-        Phone-0141-2395790/91
-    </div>
+        {% if address.address_line2 %}
+        <div class="center">{{ address.address_line2 }}</div>
+        {% endif %}
 
-    <div class="right timestamp">
-        <b>TIMESTAMP:</b>
-        {{ frappe.utils.format_datetime(doc.creation, "dd/MM/yyyy HH:mm:ss") }}
-    </div>
+        <div class="center">
+            {{ address.city }}
+            {% if address.pincode %}-{{ address.pincode }}{% endif %}
+            {% if address.state %} ({{ address.state|upper }}){% endif %}
+        </div>
 
-    <div class="center" style="font-size:12px;margin-bottom:5px;">
-        <b><u>CHALLAN / GATE PASS</u></b>
-    </div>
+        {% if address.phone %}
+        <div class="center">
+            Phone-{{ address.phone }}
+        </div>
+        {% endif %}
+        {% endif %}
 
-    {% set handover_to = frappe.get_doc("Reception Person", doc.handover_tofrom) if doc.handover_tofrom else None %}
-    {% set handover_place = frappe.get_doc("Reception Person", doc.handover_place) if doc.handover_place else None %}
+        <div class="right timestamp">
+            <b>TIMESTAMP:</b>
+            {{ frappe.utils.format_datetime(doc.creation, "dd/MM/yyyy HH:mm:ss") }}
+        </div>
 
-    <table class="info-table">
+        <div class="center" style="font-size:12px;margin-bottom:5px;">
+            <b><u>CHALLAN / GATE PASS</u></b>
+        </div>
 
-        <tr>
-            <td>Made By</td>
-            <td>{{ doc.owner_name or doc.owner }}</td>
-        </tr>
+        {% set handover_to = frappe.get_doc("Reception Person", doc.handover_tofrom) if doc.handover_tofrom else None %}
+        {% set handover_place = frappe.get_doc("Reception Person", doc.handover_place) if doc.handover_place else None
+        %}
 
-        <tr>
-            <td>GP No</td>
-            <td>{{ doc.name }}</td>
-        </tr>
-
-        <tr>
-            <td>Handover To</td>
-            <td>{{ handover_to.full_name if handover_to else "" }}</td>
-        </tr>
-
-        <tr>
-            <td>Address</td>
-            <td>{{ handover_place.address if handover_place else "" }}</td>
-        </tr>
-
-    </table>
-
-    <table class="items-table">
-
-        <thead>
+        <table class="info-table">
 
             <tr>
-                <th style="width:58%;">ITEM</th>
-                <th style="width:12%;">QTY</th>
-                <th style="width:20%;">REF</th>
-                <th style="width:10%;">RET</th>
+                <td>Made By</td>
+                <td>{{ doc.owner_name or doc.owner }}</td>
             </tr>
-
-        </thead>
-
-        <tbody>
-
-            {% for row in doc.items %}
 
             <tr>
-                <td>{{ row.item }}</td>
-                <td>{{ row.qty|int }}</td>
-                <td>{{ row.remarks or "" }}</td>
-                <td>{{ "Y" if row.is_returnable else "N" }}</td>
+                <td>GP No</td>
+                <td>{{ doc.name }}</td>
             </tr>
 
-            {% endfor %}
+            <tr>
+                <td>Handover To</td>
+                <td>{{ handover_to.full_name if handover_to else "" }}</td>
+            </tr>
 
-        </tbody>
+            <tr>
+                <td>Address</td>
+                <td>{{ handover_place.address if handover_place else "" }}</td>
+            </tr>
 
-    </table>
+        </table>
 
-</div>
+        <table class="items-table">
+
+            <thead>
+
+                <tr>
+                    <th style="width:58%;">ITEM</th>
+                    <th style="width:12%;">QTY</th>
+                    <th style="width:20%;">REF</th>
+                    <th style="width:10%;">RET</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for row in doc.items %}
+
+                <tr>
+                    <td>{{ row.item }}</td>
+                    <td>{{ row.qty|int }}</td>
+                    <td>{{ row.remarks or "" }}</td>
+                    <td>{{ "Y" if row.is_returnable else "N" }}</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 </body>
+
 </html>
