@@ -11,9 +11,10 @@
   "direction",
   "handover_section",
   "handover_tofrom",
-  "referance",
+  "company",
   "column_break_wqqy",
   "handover_place",
+  "referance",
   "items_section",
   "items",
   "amended_from"
@@ -85,13 +86,19 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-09 15:27:58.244827",
+ "modified": "2026-07-09 17:44:25.234925",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass",
