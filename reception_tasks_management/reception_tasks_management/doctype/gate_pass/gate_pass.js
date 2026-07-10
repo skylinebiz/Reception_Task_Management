@@ -22,6 +22,17 @@ frappe.ui.form.on("Gate Pass", {
                 `)
                 .appendTo("head");
         }
+        frm.set_query("handover_tofrom", () => {
+            return {
+                query: "reception_tasks_management.api.reception_person.reception_person_query"
+            };
+        });
+
+        frm.set_query("handover_place", () => {
+            return {
+                query: "reception_tasks_management.api.reception_person.reception_person_query"
+            };
+        });
     },
 
     refresh(frm) {
@@ -34,7 +45,7 @@ frappe.ui.form.on("Gate Pass", {
             });
         }
 
-         if (!frm.is_new()) {
+        if (!frm.is_new()) {
             frm.add_custom_button(__("Download Thermal PDF"), function () {
                 const url =
                     `/api/method/reception_tasks_management.api.gatepass.download_gate_pass_pdf?name=${encodeURIComponent(frm.doc.name)}`;
@@ -71,6 +82,7 @@ function update_handover_section(frm) {
 
 function open_get_items_dialog(frm) {
     const search_direction = frm.doc.direction === "IN" ? "OUT" : "IN";
+    const company = frm.doc.company
 
     const dialog = new frappe.ui.Dialog({
         title: __("Get Returnable Items"),
@@ -160,6 +172,7 @@ function open_get_items_dialog(frm) {
                 method: "reception_tasks_management.api.gatepass.get_pending_return_items",
                 args: {
                     direction: search_direction,
+                    company: company,
                     search: dialog.get_value("search")
                 },
                 callback(r) {
@@ -209,6 +222,7 @@ function open_get_items_dialog(frm) {
             const doc = frappe.model.get_new_doc("Gate Pass");
 
             doc.direction = frm.doc.direction;
+            doc.company = company
             items.forEach(d => {
                 const row = frappe.model.add_child(doc, "Gate Pass Item", "items");
 

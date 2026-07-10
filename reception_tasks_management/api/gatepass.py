@@ -6,12 +6,14 @@ from werkzeug.wrappers import Response
 
 
 @frappe.whitelist()
-def get_pending_return_items(direction, search=None):
+def get_pending_return_items(direction, company=None, search=None):
 
     direction = "OUT" if direction == "IN" else "IN"
 
     filters = {
-        "direction": direction
+        "direction": direction,
+        "company": company
+
     }
 
     condition = ""
@@ -26,9 +28,15 @@ def get_pending_return_items(direction, search=None):
         """
         filters["search"] = f"%{search}%"
 
+    if company:
+        condition += """
+            AND gp.company = %(company)s
+        """
+
     return frappe.db.sql(f"""
         SELECT
             gp.name AS gate_pass,
+            gp.company,
             gp.handover_tofrom,
             gp.handover_place,
             rp.full_name AS handover_name,

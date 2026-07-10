@@ -38,8 +38,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "phone",
    "fieldtype": "Phone",
+   "in_list_view": 1,
    "label": "Phone"
   },
   {
@@ -52,7 +54,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-06 16:09:34.546490",
+ "modified": "2026-07-10 14:46:06.806392",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Reception Person",
@@ -75,7 +77,7 @@
  "quick_entry": 1,
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "search_fields": "address",
+ "search_fields": "address, phone",
  "show_title_field_in_link": 1,
  "sort_field": "creation",
  "sort_order": "DESC",
