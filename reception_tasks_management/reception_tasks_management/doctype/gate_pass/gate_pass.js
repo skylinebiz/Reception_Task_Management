@@ -171,7 +171,7 @@ function open_get_items_dialog(frm) {
             frappe.call({
                 method: "reception_tasks_management.api.gatepass.get_pending_return_items",
                 args: {
-                    direction: search_direction,
+                    direction: frm.doc.direction,
                     company: company,
                     search: dialog.get_value("search")
                 },
