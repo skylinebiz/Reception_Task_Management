@@ -11,11 +11,10 @@
    "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Reception Person",
-   "link_to": "Reception Person",
+   "label": "Masters",
    "link_type": "DocType",
    "show_arrow": 0,
-   "type": "Link"
+   "type": "Section Break"
   },
   {
    "child": 0,
@@ -28,6 +27,53 @@
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Reception Person",
+   "link_to": "Reception Person",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Supplier",
+   "link_to": "Supplier",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Transporter Entry",
+   "link_to": "Transporter Entry",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Reports",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break"
   },
   {
    "child": 0,
@@ -54,7 +100,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-07-18 12:40:45.601815",
+ "modified": "2026-07-24 15:43:07.080617",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Reception Tasks",

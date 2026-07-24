@@ -8,14 +8,14 @@
  "icon_type": "App",
  "idx": 0,
  "label": "Reception Tasks",
- "link_to": "Reception Task Management",
+ "link_to": "Reception Tasks",
  "link_type": "Workspace Sidebar",
- "modified": "2026-07-09 15:52:49.920045",
+ "modified": "2026-07-24 15:45:26.796535",
  "modified_by": "Administrator",
  "name": "Reception Tasks",
  "owner": "Administrator",
  "restrict_removal": 0,
  "roles": [],
- "sidebar": "Reception Task Management",
+ "sidebar": "Reception Tasks",
  "standard": 1
 }
