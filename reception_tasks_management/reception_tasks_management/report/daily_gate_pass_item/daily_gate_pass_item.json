@@ -7,10 +7,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 1,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-18 13:44:21.021350",
+ "modified": "2026-07-24 15:49:17.138968",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Daily Gate Pass Item",
@@ -23,6 +23,9 @@
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "Receptionist"
   }
  ],
  "timeout": 0

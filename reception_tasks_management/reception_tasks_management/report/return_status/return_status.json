@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-18 13:40:45.415335",
+ "modified": "2026-07-24 15:49:36.553261",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Return Status",
@@ -20,6 +20,13 @@
  "ref_doctype": "Gate Pass",
  "report_name": "Return Status",
  "report_type": "Query Report",
- "roles": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Receptionist"
+  }
+ ],
  "timeout": 0
 }
