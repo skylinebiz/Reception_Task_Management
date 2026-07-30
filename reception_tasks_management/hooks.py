@@ -52,6 +52,31 @@ doctype_js = {
     "Supplier": "public/js/supplier.js",
 }
 
+
+fixtures = [
+    {
+        "dt": "Role",
+        "filters": [
+            ["name", "in", ["Reception User", "Reception Manager"]]
+        ]
+    },
+    {
+        "dt": "Custom DocPerm",
+        "filters": [
+            [
+                "parent",
+                "in",
+                [
+                    "Gate Pass",
+                    "Transporter Entry",
+                    "Reception Person",
+                    "Supplier"
+                ]
+            ]
+        ]
+    }
+]
+
 # Svg Icons
 # ------------------
 # include app icons in desk
@@ -96,7 +121,7 @@ doctype_js = {
 # ------------
 
 # before_uninstall = "reception_tasks_management.uninstall.before_uninstall"
-# after_uninstall = "reception_tasks_management.uninstall.after_uninstall"
+after_uninstall = "reception_tasks_management.uninstall.after_uninstall"
 
 # Integration Setup
 # ------------------
