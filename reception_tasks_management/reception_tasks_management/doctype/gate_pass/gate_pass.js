@@ -2,6 +2,11 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Gate Pass", {
+    onload(frm) {
+        if (frm.is_new()) {
+            frm.set_value("date", frappe.datetime.get_today());
+        }
+    },
     setup(frm) {
         if (!$("#gate-pass-css").length) {
             $("<style id='gate-pass-css'>")
@@ -39,7 +44,6 @@ frappe.ui.form.on("Gate Pass", {
         update_handover_section(frm);
 
         if (frm.is_new()) {
-
             frm.add_custom_button(__("Get Returnable Items"), () => {
                 open_get_items_dialog(frm);
             });
