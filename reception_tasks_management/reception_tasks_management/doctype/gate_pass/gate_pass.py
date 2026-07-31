@@ -4,7 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
-
+from frappe import _
 
 class GatePass(Document):
     def before_save(self):
@@ -82,3 +82,24 @@ class GatePass(Document):
             original.pending_qty = flt(original.qty) - returned
 
             original.db_update()
+
+
+    def validate(self):
+        self.validate_items()
+
+    def validate_items(self):
+        # Remove completely blank rows
+        self.items = [
+            row for row in self.items
+            if row.item or flt(row.qty) or row.remarks
+        ]
+
+        # if not self.items:
+        #     frappe.throw(_("Please add at least one item before saving."))
+
+        for row in self.items:
+            if not row.item:
+                frappe.throw(_("Item Name is mandatory in row {0}.").format(row.idx))
+
+            # if flt(row.qty) <= 0:
+            #     frappe.throw(_("Qty must be greater than 0 in row {0}.").format(row.idx))
