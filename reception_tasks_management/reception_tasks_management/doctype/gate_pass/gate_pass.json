@@ -1,11 +1,12 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "GP.-.YYYY.-.#####",
+ "autoname": "naming_series:naming_series",
  "creation": "2026-07-06 12:48:30.524571",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "naming_series",
   "date",
   "column_break_ptur",
   "direction",
@@ -93,17 +94,25 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "GP.-.YYYY.-.#####",
+   "reqd": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-07-18 15:35:42.459059",
+ "modified": "2026-07-31 12:56:39.756597",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass",
- "naming_rule": "Expression",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {

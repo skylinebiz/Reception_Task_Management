@@ -7,6 +7,7 @@ frappe.ui.form.on("Gate Pass", {
             frm.set_value("date", frappe.datetime.get_today());
         }
     },
+
     setup(frm) {
         if (!$("#gate-pass-css").length) {
             $("<style id='gate-pass-css'>")
@@ -52,7 +53,23 @@ frappe.ui.form.on("Gate Pass", {
 
     direction(frm) {
         update_handover_section(frm);
-    }
+    },
+
+    // before_save(frm) {
+    //     if (!frm.doc.items || frm.doc.items.length === 0) {
+    //         frappe.confirm(
+    //             __("This Gate Pass has no items. Do you want to submit it?"),
+    //             () => {
+    //                 frm.save("Submit");
+    //             },
+    //             () => {
+    //                 frappe.validated = false;
+    //             }
+    //         );
+
+    //         frappe.validated = false;
+    //     }
+    // }
 });
 
 function update_handover_section(frm) {
