@@ -204,7 +204,7 @@ function open_get_items_dialog(frm) {
             const items = [];
 
             rows.forEach(r => {
-                // console.log(r);
+                console.log(r);
 
                 const qty = flt(r.return_qty);
 
