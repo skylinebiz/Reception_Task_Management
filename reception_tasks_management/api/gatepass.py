@@ -98,3 +98,23 @@ def download_gate_pass_pdf(name):
             "Content-Disposition": f'inline; filename="{name}.pdf"'
         },
     )
+
+@frappe.whitelist()
+def get_gate_pass_items(gate_pass):
+
+    return frappe.get_all(
+        "Gate Pass Item",
+        filters={
+            "parent": gate_pass,
+            "is_returnable": 1,
+            "pending_qty": (">", 0)
+        },
+        fields=[
+            "item",
+            "qty",
+            "pending_qty",
+            "remarks",
+            "item_uuid",
+            "parent"
+        ]
+    )

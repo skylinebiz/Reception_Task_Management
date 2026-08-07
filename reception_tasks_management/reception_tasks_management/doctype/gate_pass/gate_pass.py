@@ -18,10 +18,15 @@ class GatePass(Document):
                 old = old_rows.get(row.item_uuid)
                 if old:
                     row.return_qty = flt(old.return_qty)
-                    row.pending_qty = flt(row.qty) - flt(old.return_qty)
+                    row.adjusted_qty = flt(old.adjusted_qty)
+                    row.pending_qty = (
+                        flt(row.qty)
+                        - flt(old.return_qty)
+                        - flt(old.adjusted_qty)
+                    )
 
-                    # Keep the old row in sync as well
                     old.return_qty = row.return_qty
+                    old.adjusted_qty = row.adjusted_qty
                     old.pending_qty = row.pending_qty
                     old.db_update()
 
@@ -31,13 +36,21 @@ class GatePass(Document):
 
             if old:
                 row.return_qty = flt(old.return_qty)
-                row.pending_qty = flt(row.qty) - flt(row.return_qty)
+                row.adjusted_qty = flt(old.adjusted_qty)
+                row.pending_qty = (
+                    flt(row.qty)
+                    - flt(row.return_qty)
+                    - flt(row.adjusted_qty)
+                )
+
             else:
+
                 if not row.item_uuid:
                     row.item_uuid = f"{self.name}-{row.idx:03d}"
 
                 if row.is_returnable and not row.return_reference:
                     row.return_qty = 0
+                    row.adjusted_qty = 0
                     row.pending_qty = row.qty
 
     def on_submit(self):
@@ -47,7 +60,9 @@ class GatePass(Document):
         self.update_return_qty(-1)
 
     def update_return_qty(self, multiplier):
+
         for row in self.items:
+
             if not row.return_reference:
                 continue
 
@@ -57,16 +72,18 @@ class GatePass(Document):
                 INNER JOIN `tabGate Pass` gp
                     ON gp.name = gpi.parent
                 WHERE
-                    gpi.item_uuid = %s
-                    AND gp.docstatus = 1
-                ORDER BY gp.creation DESC
+                    gpi.item_uuid=%s
+                    AND gp.docstatus=1
                 LIMIT 1
             """, row.return_reference)
 
             if not original_name:
-                frappe.throw(f"Original item not found: {row.return_reference}")
+                frappe.throw(_("Original item not found: {0}").format(row.return_reference))
 
-            original = frappe.get_doc("Gate Pass Item", original_name[0][0])
+            original = frappe.get_doc(
+                "Gate Pass Item",
+                original_name[0][0]
+            )
 
             returned = flt(original.return_qty) + multiplier * flt(row.qty)
 
@@ -75,11 +92,17 @@ class GatePass(Document):
 
             if returned > flt(original.qty):
                 frappe.throw(
-                    f"Returned Qty cannot exceed Original Qty for {original.item}"
+                    _("Returned Qty cannot exceed Original Qty for {0}")
+                    .format(original.item)
                 )
 
             original.return_qty = returned
-            original.pending_qty = flt(original.qty) - returned
+
+            original.pending_qty = (
+                flt(original.qty)
+                - flt(original.return_qty)
+                - flt(original.adjusted_qty)
+            )
 
             original.db_update()
 

@@ -1,4 +1,6 @@
 frappe.query_reports["Daily Gate Pass Item"] = {
+
+
     filters: [
         {
             fieldname: "from_date",
@@ -14,5 +16,6 @@ frappe.query_reports["Daily Gate Pass Item"] = {
             default: frappe.datetime.get_today(),
             reqd: 1
         }
-    ]
+    ],
+
 };

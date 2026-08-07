@@ -42,6 +42,13 @@ frappe.ui.form.on("Gate Pass", {
     },
 
     refresh(frm) {
+        frm.fields_dict.items.grid.update_docfield_property(
+            "adjusted_qty",
+            "in_list_view",
+            0
+        );
+        frm.refresh_field("items");
+        
         update_handover_section(frm);
 
         if (frm.is_new()) {
@@ -204,7 +211,7 @@ function open_get_items_dialog(frm) {
             const items = [];
 
             rows.forEach(r => {
-                // console.log(r);
+                console.log(r);
 
                 const qty = flt(r.return_qty);
 
