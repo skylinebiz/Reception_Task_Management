@@ -4,6 +4,20 @@
 frappe.ui.form.on("Gate Pass Adjustment", {
     refresh(frm) {
 
+        const grid = frm.fields_dict.items.grid;
+
+        grid.update_docfield_property(
+            "adjusted_qty",
+            "in_list_view",
+            1
+        );
+
+        // Disable adding rows
+        grid.cannot_add_rows = true;
+        grid.wrapper.find(".grid-add-row").hide();
+
+        frm.refresh_field("items");
+
         if (frm.is_new() && frm.doc.gate_pass && !frm.doc.items.length) {
 
             frappe.call({
@@ -22,19 +36,17 @@ frappe.ui.form.on("Gate Pass Adjustment", {
                         let d = frm.add_child("items");
 
                         d.item = row.item;
-
-                        // Original issued qty (read only)
                         d.qty = row.qty;
-
-                        // Quantity to adjust
                         d.adjusted_qty = row.pending_qty;
-
                         d.remarks = row.remarks;
                         d.return_reference = row.parent;
                         d.item_uuid = row.item_uuid;
                     });
 
                     frm.refresh_field("items");
+
+                    // Hide again after refresh
+                    grid.wrapper.find(".grid-add-row").hide();
                 }
             });
 

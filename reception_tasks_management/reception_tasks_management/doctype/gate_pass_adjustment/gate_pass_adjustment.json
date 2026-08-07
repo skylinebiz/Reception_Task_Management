@@ -36,7 +36,8 @@
    "fieldname": "gate_pass",
    "fieldtype": "Link",
    "label": "Gate Pass",
-   "options": "Gate Pass"
+   "options": "Gate Pass",
+   "read_only": 1
   },
   {
    "default": "Today",
@@ -75,7 +76,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-07 17:12:14.945028",
+ "modified": "2026-08-07 18:45:26.465112",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass Adjustment",
