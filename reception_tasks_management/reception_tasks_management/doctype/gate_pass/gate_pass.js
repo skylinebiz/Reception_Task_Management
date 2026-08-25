@@ -164,7 +164,7 @@ function open_get_items_dialog(frm) {
                     },
                     {
                         fieldname: "remarks",
-                        fieldtype: "Small Text",
+                        fieldtype: "Data",
                         label: __("Remarks"),
                         read_only: 1,
                         columns: 2
@@ -217,7 +217,6 @@ function open_get_items_dialog(frm) {
                     pending_qty: r.pending_qty,
                     return_reference: r.item_uuid,
                     remarks: r.remarks
-                    // is_returnable: r.is_returnable
                 });
             });
 
@@ -238,7 +237,6 @@ function open_get_items_dialog(frm) {
                 row.pending_qty = d.pending_qty;
                 row.return_reference = d.return_reference;
                 row.remarks = d.remarks
-                // row.is_returnable = d.is_returnable;
             });
 
             dialog.hide();
