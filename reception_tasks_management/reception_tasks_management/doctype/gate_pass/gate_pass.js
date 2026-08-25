@@ -48,7 +48,7 @@ frappe.ui.form.on("Gate Pass", {
             0
         );
         frm.refresh_field("items");
-        
+
         update_handover_section(frm);
 
         if (frm.is_new()) {
@@ -61,22 +61,6 @@ frappe.ui.form.on("Gate Pass", {
     direction(frm) {
         update_handover_section(frm);
     },
-
-    // before_save(frm) {
-    //     if (!frm.doc.items || frm.doc.items.length === 0) {
-    //         frappe.confirm(
-    //             __("This Gate Pass has no items. Do you want to submit it?"),
-    //             () => {
-    //                 frm.save("Submit");
-    //             },
-    //             () => {
-    //                 frappe.validated = false;
-    //             }
-    //         );
-
-    //         frappe.validated = false;
-    //     }
-    // }
 });
 
 function update_handover_section(frm) {
@@ -131,7 +115,7 @@ function open_get_items_dialog(frm) {
                         columns: 2
                     },
                     {
-                        fieldname: "handover_name",
+                        fieldname: "tofrom_full_name",
                         fieldtype: "Data",
                         label: "Handover To/From",
                         read_only: 1,
@@ -139,7 +123,7 @@ function open_get_items_dialog(frm) {
                         columns: 2
                     },
                     {
-                        fieldname: "handover_address",
+                        fieldname: "place_full_name",
                         fieldtype: "Data",
                         label: "Place",
                         read_only: 1,
@@ -178,6 +162,13 @@ function open_get_items_dialog(frm) {
                         default: 0,
                         columns: 2
                     },
+                    {
+                        fieldname: "remarks",
+                        fieldtype: "Data",
+                        label: __("Remarks"),
+                        read_only: 1,
+                        columns: 2
+                    },
                 ]
             }
         ],
@@ -194,7 +185,6 @@ function open_get_items_dialog(frm) {
                     search: dialog.get_value("search")
                 },
                 callback(r) {
-
                     dialog.fields_dict.items.df.data = r.message || [];
                     dialog.fields_dict.items.grid.refresh();
                 }
@@ -211,8 +201,6 @@ function open_get_items_dialog(frm) {
             const items = [];
 
             rows.forEach(r => {
-                console.log(r);
-
                 const qty = flt(r.return_qty);
 
                 if (!qty) return;
@@ -228,7 +216,7 @@ function open_get_items_dialog(frm) {
                     qty: qty,
                     pending_qty: r.pending_qty,
                     return_reference: r.item_uuid,
-                    // is_returnable: r.is_returnable
+                    remarks: r.remarks
                 });
             });
 
@@ -248,7 +236,7 @@ function open_get_items_dialog(frm) {
                 row.qty = d.qty;
                 row.pending_qty = d.pending_qty;
                 row.return_reference = d.return_reference;
-                // row.is_returnable = d.is_returnable;
+                row.remarks = d.remarks
             });
 
             dialog.hide();

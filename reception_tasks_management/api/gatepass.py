@@ -12,8 +12,6 @@ def get_pending_return_items(direction, company=None, search=None):
 
     filters = {
         "direction": direction,
-        "company": company
-
     }
 
     condition = ""
@@ -32,33 +30,50 @@ def get_pending_return_items(direction, company=None, search=None):
         condition += """
             AND gp.company = %(company)s
         """
+        filters["company"] = company
 
     return frappe.db.sql(f"""
         SELECT
             gp.name AS gate_pass,
             gp.company,
+
             gp.handover_tofrom,
+            rp_tofrom.name AS tofrom_name,
+            rp_tofrom.full_name AS tofrom_full_name,
+            rp_tofrom.address AS tofrom_address,
+
             gp.handover_place,
-            rp.full_name AS handover_name,
-            rp.address AS handover_address,
+            rp_place.name AS place_name,
+            rp_place.full_name AS place_full_name,
+            rp_place.address AS place_address,
+
             gp.date,
+
             gpi.item,
             gpi.item_uuid,
             gpi.qty,
             gpi.return_qty AS returned_qty,
             gpi.pending_qty,
-            gpi.is_returnable
+            gpi.is_returnable,
+            gpi.remarks
+
         FROM `tabGate Pass Item` gpi
         INNER JOIN `tabGate Pass` gp
             ON gp.name = gpi.parent
-        LEFT JOIN `tabReception Person` rp
-            ON rp.name = gp.handover_place
+
+        LEFT JOIN `tabReception Person` rp_tofrom
+            ON rp_tofrom.name = gp.handover_tofrom
+
+        LEFT JOIN `tabReception Person` rp_place
+            ON rp_place.name = gp.handover_place
+
         WHERE
             gp.docstatus = 1
             AND gp.direction = %(direction)s
             AND gpi.is_returnable = 1
             AND gpi.pending_qty > 0
             {condition}
+
         ORDER BY gp.modified DESC
     """, filters, as_dict=True)
 
