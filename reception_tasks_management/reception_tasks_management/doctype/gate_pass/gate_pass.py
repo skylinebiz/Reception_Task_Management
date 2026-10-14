@@ -108,7 +108,40 @@ class GatePass(Document):
 
 
     def validate(self):
+        self.validate_linked_item_names()
         self.validate_items()
+
+    def validate_linked_item_names(self):
+        """Rows populated via 'Get Returnable Items' keep the original item name."""
+        before = self.get_doc_before_save()
+        saved = {d.name: d for d in before.items} if before else {}
+
+        for row in self.items:
+            if not row.return_reference:
+                continue
+
+            prev = saved.get(row.name)
+
+            if prev and prev.return_reference == row.return_reference:
+                if prev.item != row.item:
+                    frappe.throw(
+                        _("Row {0}: Item Name cannot be changed for an item linked to {1}.")
+                        .format(row.idx, row.return_reference)
+                    )
+                continue
+
+            # newly linked row: take the name from the original gate pass item
+            original_item = frappe.db.get_value(
+                "Gate Pass Item",
+                {
+                    "item_uuid": row.return_reference,
+                    "parenttype": "Gate Pass",
+                    "docstatus": 1,
+                },
+                "item",
+            )
+            if original_item:
+                row.item = original_item
 
     def validate_items(self):
         # Remove completely blank rows
