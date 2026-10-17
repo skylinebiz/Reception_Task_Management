@@ -42,17 +42,20 @@
   {
    "fieldname": "return_qty",
    "fieldtype": "Float",
-   "label": "Return Qty"
+   "label": "Return Qty",
+   "read_only": 1
   },
   {
    "fieldname": "pending_qty",
    "fieldtype": "Float",
-   "label": "Pending Qty"
+   "label": "Pending Qty",
+   "read_only": 1
   },
   {
    "fieldname": "return_reference",
    "fieldtype": "Data",
-   "label": "Return Reference"
+   "label": "Return Reference",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -74,12 +77,14 @@
   {
    "fieldname": "item_uuid",
    "fieldtype": "Data",
-   "label": "Item UUID"
+   "label": "Item UUID",
+   "read_only": 1
   },
   {
    "fieldname": "adjusted_qty",
    "fieldtype": "Float",
-   "label": "Adjusted qty"
+   "label": "Adjusted qty",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_hpja",
@@ -90,7 +95,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-07 18:13:25.739091",
+ "modified": "2026-10-14 14:59:18.786650",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass Item",

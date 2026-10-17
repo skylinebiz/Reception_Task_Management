@@ -47,12 +47,24 @@ frappe.ui.form.on("Gate Pass", {
             "in_list_view",
             0
         );
+        // per-row rule evaluated while each row renders, so linked rows are
+        // read-only from the first paint (no timing dependency on the grid)
+        frm.fields_dict.items.grid.update_docfield_property(
+            "item",
+            "read_only_depends_on",
+            "eval:doc.return_reference"
+        );
         frm.refresh_field("items");
+        lock_linked_item_names(frm);
 
         update_handover_section(frm);
 
-        if (frm.is_new()) {
+        if (frm.doc.docstatus === 0) {
             frm.add_custom_button(__("Get Returnable Items"), () => {
+                if (!frm.doc.direction) {
+                    frappe.msgprint(__("Please select Direction first."));
+                    return;
+                }
                 open_get_items_dialog(frm);
             });
         }
@@ -62,6 +74,34 @@ frappe.ui.form.on("Gate Pass", {
         update_handover_section(frm);
     },
 });
+
+frappe.ui.form.on("Gate Pass Item", {
+    form_render(frm, cdt, cdn) {
+        lock_linked_item_names(frm);
+    },
+
+    items_add(frm) {
+        lock_linked_item_names(frm);
+    },
+});
+
+// Rows populated via "Get Returnable Items" carry a return_reference;
+// their item name must follow the original gate pass and cannot be edited.
+function lock_linked_item_names(frm) {
+    const grid = frm.fields_dict.items && frm.fields_dict.items.grid;
+    if (!grid) return;
+
+    const apply = () => {
+        (grid.grid_rows || []).forEach(grid_row => {
+            const linked = !!(grid_row.doc && grid_row.doc.return_reference);
+            grid_row.toggle_editable("item", !linked);
+        });
+    };
+
+    apply();
+    // rows of a freshly routed new doc are drawn just after refresh
+    setTimeout(apply, 0);
+}
 
 function update_handover_section(frm) {
     const sections = ["handover_section", "items_section"];
@@ -222,6 +262,35 @@ function open_get_items_dialog(frm) {
 
             if (!items.length) {
                 frappe.msgprint(__("Enter Return Qty for at least one item."));
+                return;
+            }
+
+            if (!frm.is_new()) {
+                // Existing draft: append to the current form instead of creating a new doc
+                const existing = new Set(
+                    (frm.doc.items || []).map(d => d.return_reference).filter(Boolean)
+                );
+
+                // drop a single empty placeholder row, if any
+                (frm.doc.items || [])
+                    .filter(d => !d.item && !flt(d.qty) && !d.remarks)
+                    .forEach(d => frappe.model.clear_doc(d.doctype, d.name));
+
+                items.forEach(d => {
+                    if (existing.has(d.return_reference)) return;
+
+                    const row = frm.add_child("items");
+                    row.item = d.item;
+                    row.qty = d.qty;
+                    row.pending_qty = d.pending_qty;
+                    row.return_reference = d.return_reference;
+                    row.remarks = d.remarks;
+                });
+
+                frm.refresh_field("items");
+                lock_linked_item_names(frm);
+                frm.dirty();
+                dialog.hide();
                 return;
             }
 
