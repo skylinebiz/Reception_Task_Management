@@ -47,15 +47,8 @@ frappe.ui.form.on("Gate Pass", {
             "in_list_view",
             0
         );
-        // per-row rule evaluated while each row renders, so linked rows are
-        // read-only from the first paint (no timing dependency on the grid)
-        frm.fields_dict.items.grid.update_docfield_property(
-            "item",
-            "read_only_depends_on",
-            "eval:doc.return_reference"
-        );
         frm.refresh_field("items");
-        lock_linked_item_names(frm);
+        toggle_return_reference_column(frm);
 
         update_handover_section(frm);
 
@@ -76,32 +69,52 @@ frappe.ui.form.on("Gate Pass", {
 });
 
 frappe.ui.form.on("Gate Pass Item", {
-    form_render(frm, cdt, cdn) {
-        lock_linked_item_names(frm);
-    },
-
-    items_add(frm) {
-        lock_linked_item_names(frm);
+    items_remove(frm) {
+        toggle_return_reference_column(frm);
     },
 });
 
-// Rows populated via "Get Returnable Items" carry a return_reference;
-// their item name must follow the original gate pass and cannot be edited.
-function lock_linked_item_names(frm) {
+// Show the Return Reference column in the items grid only while at least
+// one row carries a return reference.
+function toggle_return_reference_column(frm) {
     const grid = frm.fields_dict.items && frm.fields_dict.items.grid;
     if (!grid) return;
 
-    const apply = () => {
-        (grid.grid_rows || []).forEach(grid_row => {
-            const linked = !!(grid_row.doc && grid_row.doc.return_reference);
-            grid_row.toggle_editable("item", !linked);
-        });
-    };
+    const show = (frm.doc.items || []).some(d => d.return_reference) ? 1 : 0;
+    const df = grid.docfields.find(d => d.fieldname === "return_reference");
+    if (!df || cint(df.in_list_view) === show) return;
 
-    apply();
-    // rows of a freshly routed new doc are drawn just after refresh
-    setTimeout(apply, 0);
+    grid.update_docfield_property("return_reference", "in_list_view", show);
+    grid.reset_grid();
 }
+
+// frappe.ui.form.on("Gate Pass Item", {
+//     form_render(frm, cdt, cdn) {
+//         // lock_linked_item_names(frm);
+//     },
+
+//     items_add(frm) {
+//         // lock_linked_item_names(frm);
+//     },
+// });
+
+// Rows populated via "Get Returnable Items" carry a return_reference;
+// their item name must follow the original gate pass and cannot be edited.
+// function lock_linked_item_names(frm) {
+//     const grid = frm.fields_dict.items && frm.fields_dict.items.grid;
+//     if (!grid) return;
+
+//     const apply = () => {
+//         (grid.grid_rows || []).forEach(grid_row => {
+//             const linked = !!(grid_row.doc && grid_row.doc.return_reference);
+//             grid_row.toggle_editable("item", !linked);
+//         });
+//     };
+
+//     apply();
+//     // rows of a freshly routed new doc are drawn just after refresh
+//     setTimeout(apply, 0);
+// }
 
 function update_handover_section(frm) {
     const sections = ["handover_section", "items_section"];
@@ -288,7 +301,7 @@ function open_get_items_dialog(frm) {
                 });
 
                 frm.refresh_field("items");
-                lock_linked_item_names(frm);
+                toggle_return_reference_column(frm);
                 frm.dirty();
                 dialog.hide();
                 return;
