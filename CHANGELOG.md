@@ -2,6 +2,36 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
+## [5.0.0] - 2026-10-23
+
+### Added
+- **Returnable Items report** (Script Report on Gate Pass, filtered by a
+  From/To Date range on the entry date). Lists every submitted returnable item,
+  whether fully returned, partly returned or still pending.
+  - Columns: Entry Date, Entry Number, Person, Place, Item Name, Remarks,
+    Returnable Qty, Returned Qty and Pending Qty.
+  - Place shows the Reception Person's address.
+  - Entry Number is a Link column and opens Frappe's side-panel preview of the
+    Gate Pass.
+  - Item Name opens **Returnable Item Details** in a new tab, filtered to that
+    item.
+- **Returnable Item Details report**, the connected report. Shows the main
+  entry details (entry number, date, direction, person, place, item, remarks,
+  returnable / returned / pending qty) above a table of the return entries made
+  against the item: Return Entry Date, Return Entry Number, Person, Place, Item
+  Name, Reference / Remarks and Return Qty. Return entry numbers are Link
+  columns.
+
+### Changed
+- **Return Reference** is now shown in the Gate Pass Item grid (list view).
+- **Item Name is editable on all rows**, including rows populated via Get
+  Returnable Items. This supersedes the 4.2.0 read-only rule.
+
+### Removed
+- The server-side guard for linked item names (`Gate Pass.validate`): linked
+  rows no longer take the original item name on save, and renames are no longer
+  rejected.
+
 ## [4.2.0] - 2026-10-14
 
 ### Added
