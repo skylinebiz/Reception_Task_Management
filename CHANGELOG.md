@@ -2,12 +2,12 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
-## [5.0.0] - 2026-10-23
+## [5.0.0] - 2026-10-25
 
 ### Added
-- **Returnable Items report** (Script Report on Gate Pass, filtered by a
-  From/To Date range on the entry date). Lists every submitted returnable item,
-  whether fully returned, partly returned or still pending.
+- **Returnable Items report** (Script Report on Gate Pass). Takes a From/To Date
+  range on the entry date and lists every submitted returnable item, whether
+  fully returned, partly returned or still pending.
   - Columns: Entry Date, Entry Number, Person, Place, Item Name, Remarks,
     Returnable Qty, Returned Qty and Pending Qty.
   - Place shows the Reception Person's address.
@@ -15,22 +15,38 @@ All notable changes to Reception Tasks Management are documented here.
     Gate Pass.
   - Item Name opens **Returnable Item Details** in a new tab, filtered to that
     item.
-- **Returnable Item Details report**, the connected report. Shows the main
-  entry details (entry number, date, direction, person, place, item, remarks,
+- **Returnable Item Details report**, the connected report. Shows the main entry
+  details (entry number, date, direction, person, place, item, remarks,
   returnable / returned / pending qty) above a table of the return entries made
   against the item: Return Entry Date, Return Entry Number, Person, Place, Item
-  Name, Reference / Remarks and Return Qty. Return entry numbers are Link
-  columns.
+  Name, Reference / Remarks and Return Qty. Return entry numbers are Link columns.
+- Both reports are available from the Reception Tasks sidebar (Returnable Items).
 
 ### Changed
-- **Return Reference** is now shown in the Gate Pass Item grid (list view).
-- **Item Name is editable on all rows**, including rows populated via Get
-  Returnable Items. This supersedes the 4.2.0 read-only rule.
+- **Item Name is editable on every Gate Pass Item row**, including rows populated
+  via Get Returnable Items. This supersedes the 4.2.0 read-only rule.
+- **Return Reference column in the items grid is dynamic:** shown only while at
+  least one row carries a return reference, hidden otherwise.
+- **Return Qty check on Submit** now counts adjusted qty (original qty minus
+  adjusted qty is the limit) and reports the row, the item (with its reference
+  without the row suffix), the original qty and the returnable qty:
+  `Row No | Item Name | Original Qty | Returnable`. Cancel still takes the qty
+  back off the original row.
+- Several Gate Passes can return the same original row, each with its own item
+  name; only the combined returned qty is limited, and it is checked on Submit
+  only (not on Save).
+- Rows with a return reference no longer require Same Item Name.
 
 ### Removed
-- The server-side guard for linked item names (`Gate Pass.validate`): linked
-  rows no longer take the original item name on save, and renames are no longer
+- The server-side guard for linked item names (`validate_linked_item_names`):
+  linked rows no longer take the original item name and renames are no longer
   rejected.
+
+### Upgrade notes
+- Run `bench --site <site> migrate` (new reports, Gate Pass Item field setting),
+  then `bench build --app reception_tasks_management` and hard-refresh browsers.
+- The old report names from development ("Returnable Items Register",
+  "Returnable Item Returns") can be deleted from the Report list if they exist.
 
 ## [4.2.0] - 2026-10-14
 
