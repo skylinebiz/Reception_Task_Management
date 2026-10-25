@@ -90,10 +90,25 @@ class GatePass(Document):
             if returned < 0:
                 returned = 0
 
-            if returned > flt(original.qty):
+            if multiplier > 0 and returned + flt(original.adjusted_qty) > flt(original.qty):
+                returnable = (
+                    flt(original.qty) - flt(original.return_qty) - flt(original.adjusted_qty)
+                )
                 frappe.throw(
-                    _("Returned Qty cannot exceed Original Qty for {0}")
-                    .format(original.item)
+                    "<b>{row_no}:</b> {idx}<br>"
+                    "<b>{item_name}:</b> {item} ({reference})<br>"
+                    "<b>{original_qty}:</b> {qty} | <b>{returnable_qty}:</b> {returnable}".format(
+                        row_no=_("Row No"),
+                        item_name=_("Item Name"),
+                        original_qty=_("Original Qty"),
+                        returnable_qty=_("Returnable"),
+                        idx=row.idx,
+                        item=frappe.utils.escape_html(row.item or original.item),
+                        reference=frappe.utils.escape_html(row.return_reference.rsplit("-", 1)[0]),
+                        qty=flt(original.qty),
+                        returnable=returnable,
+                    ),
+                    title=_("Return Qty exceeds the limit"),
                 )
 
             original.return_qty = returned
@@ -108,40 +123,7 @@ class GatePass(Document):
 
 
     def validate(self):
-        self.validate_linked_item_names()
         self.validate_items()
-
-    def validate_linked_item_names(self):
-        """Rows populated via 'Get Returnable Items' keep the original item name."""
-        before = self.get_doc_before_save()
-        saved = {d.name: d for d in before.items} if before else {}
-
-        for row in self.items:
-            if not row.return_reference:
-                continue
-
-            prev = saved.get(row.name)
-
-            if prev and prev.return_reference == row.return_reference:
-                if prev.item != row.item:
-                    frappe.throw(
-                        _("Row {0}: Item Name cannot be changed for an item linked to {1}.")
-                        .format(row.idx, row.return_reference)
-                    )
-                continue
-
-            # newly linked row: take the name from the original gate pass item
-            original_item = frappe.db.get_value(
-                "Gate Pass Item",
-                {
-                    "item_uuid": row.return_reference,
-                    "parenttype": "Gate Pass",
-                    "docstatus": 1,
-                },
-                "item",
-            )
-            if original_item:
-                row.item = original_item
 
     def validate_items(self):
         # Remove completely blank rows
@@ -150,12 +132,7 @@ class GatePass(Document):
             if row.item or flt(row.qty) or row.remarks
         ]
 
-        # if not self.items:
-        #     frappe.throw(_("Please add at least one item before saving."))
 
         for row in self.items:
-            if not row.item:
+            if not row.item and not row.return_reference:
                 frappe.throw(_("Item Name is mandatory in row {0}.").format(row.idx))
-
-            # if flt(row.qty) <= 0:
-            #     frappe.throw(_("Qty must be greater than 0 in row {0}.").format(row.idx))
