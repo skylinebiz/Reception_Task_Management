@@ -5,10 +5,12 @@ app_description = "Reception Tasks Management"
 app_email = "harshit@skylinebiz.in"
 app_license = "mit"
 app_home = "/desk/reception-tasks-management/gate-pass"
+app_logo_url = "/assets/reception_tasks_management/images/reception-tasks-logo.svg"
 
 add_to_apps_screen = [
     {
         "name": app_name,
+        "logo": app_logo_url,
         "title": app_title,
         "route": app_home,
     }
