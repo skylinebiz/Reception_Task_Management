@@ -2,6 +2,16 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
+## [5.1.0] - 2026-11-03
+
+### Added
+- **App icon** — the app now has its own icon (an "R" tile, `reception-tasks-logo.svg`) on the Apps screen, set through `app_logo_url` / `add_to_apps_screen` in `hooks.py`.
+
+### Changed
+- **Sidebar** — Gate Pass, Reception Person, Supplier, Gate Pass Adjustment and
+  Transporter Entry are now grouped under a new **Masters** section, the
+  **Reports** section is no longer indented, and Returnable Items has a table icon.
+
 ## [5.0.0] - 2026-10-25
 
 ### Added

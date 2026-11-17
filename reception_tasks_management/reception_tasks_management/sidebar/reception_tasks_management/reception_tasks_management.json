@@ -14,6 +14,20 @@
    "indent": 0,
    "is_default_module": 0,
    "keep_closed": 0,
+   "label": "Masters",
+   "link_type": "DocType",
+   "open_in_new_tab": 1,
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "added": 0,
+   "child": 1,
+   "collapsible": 1,
+   "hidden": 0,
+   "indent": 0,
+   "is_default_module": 0,
+   "keep_closed": 0,
    "label": "Gate Pass",
    "link_to": "Gate Pass",
    "link_type": "DocType",
@@ -23,7 +37,7 @@
   },
   {
    "added": 0,
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "hidden": 0,
    "indent": 0,
@@ -38,7 +52,7 @@
   },
   {
    "added": 0,
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "hidden": 0,
    "indent": 0,
@@ -53,7 +67,7 @@
   },
   {
    "added": 0,
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "hidden": 0,
    "indent": 0,
@@ -68,7 +82,7 @@
   },
   {
    "added": 0,
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "hidden": 0,
    "indent": 0,
@@ -86,7 +100,7 @@
    "child": 0,
    "collapsible": 1,
    "hidden": 0,
-   "indent": 1,
+   "indent": 0,
    "is_default_module": 0,
    "keep_closed": 0,
    "label": "Reports",
@@ -132,6 +146,7 @@
    "child": 1,
    "collapsible": 1,
    "hidden": 0,
+   "icon": "table",
    "indent": 0,
    "is_default_module": 0,
    "keep_closed": 0,
@@ -143,7 +158,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-10-23 13:31:29.851012",
+ "modified": "2026-10-29 16:07:16.242012",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Reception Tasks Management",
