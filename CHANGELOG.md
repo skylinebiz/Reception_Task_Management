@@ -2,6 +2,26 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
+## [5.2.0] - 2026-11-19
+
+### Changed
+- **App icon** — replaced the grey "R" text tile with a drawn icon: a gate pass ticket with a check
+  mark on a green rounded square (`reception-tasks-logo.svg`). It has no text, so it stays readable
+  at sidebar size.
+- **Returnable Items** and **Returnable Item Details** reports no longer carry a default
+  System Manager role. Anyone with Report permission on Gate Pass (the reports' reference doctype)
+  can now open them.
+
+### Removed
+- The old `workspace_sidebar/` sidebar **Reception Tasks**. This Frappe version no longer imports
+  that folder; the app's sidebar is the module `Sidebar` under
+  `reception_tasks_management/reception_tasks_management/sidebar/`.
+- New patch `remove_legacy_workspace_sidebars` (pre model sync) deletes the old `Workspace Sidebar`
+  record from the database, so Frappe's sidebar upgrade does not rebuild it.
+
+### Upgrade notes
+- Run `bench --site <site> migrate` (report roles, old sidebar cleanup), then hard-refresh browsers to see the new icon.
+
 ## [5.1.0] - 2026-11-03
 
 ### Added
