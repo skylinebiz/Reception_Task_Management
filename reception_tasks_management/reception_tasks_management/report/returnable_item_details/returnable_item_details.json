@@ -1,13 +1,19 @@
 {
  "add_total_row": 0,
+ "add_translate_data": 0,
  "columns": [],
+ "creation": "2026-10-29 13:17:07.573555",
+ "disable_prepared_report_automation": 0,
  "disabled": 0,
  "docstatus": 0,
  "doctype": "Report",
+ "doctype_to_sync": [],
  "filters": [],
+ "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-10-23 12:00:00.000000",
+ "modified": "2026-11-19 13:31:45.585027",
+ "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Returnable Item Details",
  "owner": "Administrator",
@@ -15,10 +21,7 @@
  "ref_doctype": "Gate Pass",
  "report_name": "Returnable Item Details",
  "report_type": "Script Report",
- "roles": [
-  {
-   "role": "System Manager"
-  }
- ],
+ "roles": [],
+ "snapshot_report": 0,
  "timeout": 0
 }
