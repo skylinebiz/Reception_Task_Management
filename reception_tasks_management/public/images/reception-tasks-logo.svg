@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="14" fill="#7C7C84"/>
-	<text x="32" y="33" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="600">R</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none">
+	<title>Reception Tasks Management</title>
+	<rect width="100" height="100" rx="28" fill="#059669"/>
+	<path d="M26 30H74A8 8 0 0 1 82 38V43A7 7 0 0 0 82 57V62A8 8 0 0 1 74 70H26A8 8 0 0 1 18 62V57A7 7 0 0 0 18 43V38A8 8 0 0 1 26 30Z" fill="#FFFFFF"/>
+	<path d="M38 50L46 58L62 42" stroke="#059669" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
