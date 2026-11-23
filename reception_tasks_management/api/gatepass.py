@@ -70,7 +70,9 @@ def get_pending_return_items(direction, company=None, search=None):
         WHERE
             gp.docstatus = 1
             AND gp.direction = %(direction)s
+            AND gpi.parenttype = 'Gate Pass'
             AND gpi.is_returnable = 1
+            AND IFNULL(gpi.return_reference, '') = ''
             AND gpi.pending_qty > 0
             {condition}
 
@@ -117,10 +119,15 @@ def download_gate_pass_pdf(name):
 @frappe.whitelist()
 def get_gate_pass_items(gate_pass):
 
+    # Only submitted Gate Passes can be adjusted
+    if frappe.db.get_value("Gate Pass", gate_pass, "docstatus") != 1:
+        return []
+
     return frappe.get_all(
         "Gate Pass Item",
         filters={
             "parent": gate_pass,
+            "parenttype": "Gate Pass",
             "is_returnable": 1,
             "pending_qty": (">", 0)
         },
