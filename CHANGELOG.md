@@ -2,7 +2,13 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
-## [5.3.0] - 2026-11-23
+## [6.0.0] - 2026-11-23
+
+This release was first pushed as 5.3.0 (commit `f8663f1`) and is renumbered 6.0.0 with no code
+changes, because it adds a Gate Pass Item field and rejects documents that 5.x accepted: cancelling
+a referenced Gate Pass, invalid return references, zero or negative return qty, and adjustments
+above pending qty. There is no separate 5.3.0 release. A site that already ran `migrate` on 5.3.0
+needs nothing more; the `set_return_gate_pass` patch keeps its name and does not run again.
 
 ### Added
 - **Return Gate Pass** (`return_gate_pass`, read-only Link → Gate Pass) on Gate Pass Item. It is set
