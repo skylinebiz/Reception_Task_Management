@@ -39,8 +39,10 @@ frappe.ui.form.on("Gate Pass Adjustment", {
                         d.qty = row.qty;
                         d.adjusted_qty = row.pending_qty;
                         d.remarks = row.remarks;
-                        d.return_reference = row.parent;
-                        d.item_uuid = row.item_uuid;
+                        // Same as a return row: return_reference is the original
+                        // row's uuid. The row gets its own item_uuid on save.
+                        d.return_reference = row.item_uuid;
+                        d.return_gate_pass = row.parent;
                     });
 
                     frm.refresh_field("items");

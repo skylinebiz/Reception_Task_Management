@@ -8,10 +8,37 @@ from frappe import _
 
 from reception_tasks_management.reception_tasks_management.doctype.gate_pass.gate_pass import (
     get_original_item,
+    set_item_uuids,
+    skip_missing_original,
 )
 
 
+def get_reference_uuid(row):
+    """The original Gate Pass row's item_uuid that an adjustment row points at.
+
+    Rows are stored like return rows: `return_reference` = original item_uuid.
+    Rows saved before the `adjustment_row_reference` patch stored the Gate Pass
+    name in `return_reference` and the original uuid in `item_uuid`; they are
+    still read correctly until the patch runs.
+    """
+    if row.return_reference and frappe.db.exists("Gate Pass", row.return_reference):
+        return row.item_uuid
+    return row.return_reference
+
+
 class GatePassAdjustment(Document):
+
+    def before_insert(self):
+        # Rows get their own uuids; nothing references an adjustment row, and a
+        # duplicated adjustment must not share them with its source.
+        for row in self.items:
+            # Old-format row (e.g. from a cached form script): move the
+            # original uuid into return_reference before clearing item_uuid.
+            row.return_reference = get_reference_uuid(row)
+            row.item_uuid = None
+
+    def before_save(self):
+        set_item_uuids(self)
 
     def validate(self):
         self.validate_gate_pass()
@@ -25,22 +52,24 @@ class GatePassAdjustment(Document):
         for row in self.items:
             prefix = _("Row {0}").format(row.idx)
 
-            if not row.return_reference or not row.item_uuid:
-                frappe.throw(_("{0}: Gate Pass reference is missing.").format(prefix))
+            reference_uuid = get_reference_uuid(row)
 
-            if self.gate_pass and row.return_reference != self.gate_pass:
+            if not reference_uuid:
+                frappe.throw(_("{0}: Original Gate Pass Item reference is missing.").format(prefix))
+
+            original = get_original_item(reference_uuid)
+
+            if not original:
                 frappe.throw(
-                    _("{0}: item belongs to {1}, not {2}.")
-                    .format(prefix, row.return_reference, self.gate_pass)
+                    _("{0}: Item {1} was not found in any submitted Gate Pass "
+                      "(the Gate Pass is draft, cancelled or amended), so it cannot be adjusted.")
+                    .format(prefix, frappe.bold(reference_uuid))
                 )
 
-            original = get_original_item(row.item_uuid)
-
-            if not original or original.parent != row.return_reference:
+            if self.gate_pass and original.parent != self.gate_pass:
                 frappe.throw(
-                    _("{0}: Gate Pass {1} is not submitted (draft, cancelled or amended) "
-                      "or does not contain this item, so it cannot be adjusted.")
-                    .format(prefix, frappe.bold(row.return_reference))
+                    _("{0}: item belongs to {1}, not {2}.")
+                    .format(prefix, original.parent, self.gate_pass)
                 )
 
             if not original.is_returnable:
@@ -71,19 +100,18 @@ class GatePassAdjustment(Document):
 
         for row in self.items:
 
-            # Resolve by item_uuid against the *submitted* Gate Pass. The uuid is
-            # kept across amendments, so this finds the live row (e.g. GP-1-1)
-            # rather than the cancelled one the parent name may point at.
-            original_row = get_original_item(row.item_uuid)
+            # Resolve the original row's uuid against the *submitted* Gate Pass.
+            # The uuid is kept across amendments, so this finds the live row
+            # (e.g. GP-1-1) rather than the cancelled one.
+            reference_uuid = get_reference_uuid(row)
+            original_row = get_original_item(reference_uuid)
 
             if not original_row:
-                if multiplier < 0:
-                    # Original was cancelled before cancellation was blocked;
-                    # nothing left to reverse.
+                if skip_missing_original(reference_uuid, multiplier):
                     continue
                 frappe.throw(
-                    _("Original Gate Pass Item not found for Item UUID {0}")
-                    .format(row.item_uuid)
+                    _("Original Gate Pass Item not found for {0}")
+                    .format(reference_uuid)
                 )
 
             original = frappe.get_doc("Gate Pass Item", original_row.name)

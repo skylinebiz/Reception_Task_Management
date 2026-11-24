@@ -28,6 +28,129 @@ def get_original_item(item_uuid):
     return rows[0] if rows else None
 
 
+def skip_missing_original(item_uuid, multiplier):
+    """Whether a return/adjustment row whose original is not on a submitted
+    Gate Pass may be skipped.
+
+    Only on cancel, and only when the uuid does exist on a Gate Pass that is
+    no longer submitted (cancelled before cancelling was blocked), so there is
+    nothing left to reverse. A uuid that exists nowhere means the reference
+    itself is wrong (e.g. code and data out of step); skipping it would leave
+    the original's quantities wrong, so the caller must throw instead.
+    """
+    return multiplier < 0 and bool(frappe.db.exists(
+        "Gate Pass Item", {"item_uuid": item_uuid, "parenttype": "Gate Pass"}
+    ))
+
+
+def get_reference_totals(item_uuid):
+    """Returned and adjusted qty booked against an original row, summed from
+    submitted return Gate Passes and submitted Gate Pass Adjustments."""
+    returned = frappe.db.sql("""
+        SELECT IFNULL(SUM(gpi.qty), 0)
+        FROM `tabGate Pass Item` gpi
+        INNER JOIN `tabGate Pass` gp
+            ON gp.name = gpi.parent AND gpi.parenttype = 'Gate Pass'
+        WHERE gp.docstatus = 1 AND gpi.return_reference = %s
+    """, item_uuid)[0][0]
+
+    # Second branch: adjustment rows saved before the adjustment_row_reference
+    # patch (return_reference = Gate Pass name, item_uuid = original uuid).
+    adjusted = frappe.db.sql("""
+        SELECT IFNULL(SUM(gpi.adjusted_qty), 0)
+        FROM `tabGate Pass Item` gpi
+        INNER JOIN `tabGate Pass Adjustment` gpa
+            ON gpa.name = gpi.parent AND gpi.parenttype = 'Gate Pass Adjustment'
+        WHERE gpa.docstatus = 1
+            AND (
+                gpi.return_reference = %(uuid)s
+                OR (gpi.item_uuid = %(uuid)s
+                    AND EXISTS (SELECT 1 FROM `tabGate Pass` g WHERE g.name = gpi.return_reference))
+            )
+    """, {"uuid": item_uuid})[0][0]
+
+    return flt(returned), flt(adjusted)
+
+
+def recalculate_returnable_qty(item_uuids=None, dry_run=False):
+    """Recompute return_qty, adjusted_qty and pending_qty of returnable rows on
+    submitted Gate Passes from the documents that reference them.
+
+    Returns a list of the rows whose stored values differed. With dry_run, only
+    reports; otherwise writes the correct values. A row whose submitted returns
+    and adjustments add up to more than its qty is never written (its pending
+    qty would be negative); it is returned with `overbooked=True` so the
+    offending document can be cancelled by hand.
+    """
+    filters = ""
+    values = {}
+    if item_uuids:
+        filters = "AND gpi.item_uuid IN %(uuids)s"
+        values["uuids"] = tuple(item_uuids)
+
+    rows = frappe.db.sql(f"""
+        SELECT gpi.name, gpi.parent, gpi.idx, gpi.item, gpi.item_uuid, gpi.qty,
+            gpi.return_qty, gpi.adjusted_qty, gpi.pending_qty
+        FROM `tabGate Pass Item` gpi
+        INNER JOIN `tabGate Pass` gp
+            ON gp.name = gpi.parent AND gpi.parenttype = 'Gate Pass'
+        WHERE gp.docstatus = 1
+            AND gpi.is_returnable = 1
+            AND IFNULL(gpi.return_reference, '') = ''
+            AND IFNULL(gpi.item_uuid, '') != ''
+            {filters}
+    """, values, as_dict=True)
+
+    changes = []
+    for row in rows:
+        returned, adjusted = get_reference_totals(row.item_uuid)
+        pending = flt(row.qty) - returned - adjusted
+
+        if (flt(row.return_qty), flt(row.adjusted_qty), flt(row.pending_qty)) != (returned, adjusted, pending):
+            overbooked = pending < 0
+            changes.append(frappe._dict(
+                row=row.name, gate_pass=row.parent, idx=row.idx, item=row.item, item_uuid=row.item_uuid,
+                before=(flt(row.return_qty), flt(row.adjusted_qty), flt(row.pending_qty)),
+                after=(returned, adjusted, pending),
+                overbooked=overbooked,
+            ))
+            if not dry_run and not overbooked:
+                frappe.db.set_value(
+                    "Gate Pass Item", row.name,
+                    {"return_qty": returned, "adjusted_qty": adjusted, "pending_qty": pending},
+                    update_modified=False,
+                )
+
+    return changes
+
+
+def set_item_uuids(doc):
+    """Give every row of `doc.items` a unique item_uuid of the form `<name>-NNN`.
+
+    Used by Gate Pass and Gate Pass Adjustment. Numbers continue after the
+    highest one already used in the document (instead of using the row idx),
+    so deleting and re-adding rows can never produce two rows with the same uuid.
+    """
+    prefix = f"{doc.name}-"
+    seen = set()
+    last_no = 0
+
+    for row in doc.items:
+        if not row.item_uuid or row.item_uuid in seen:
+            row.item_uuid = None
+            continue
+
+        seen.add(row.item_uuid)
+        suffix = row.item_uuid[len(prefix):] if row.item_uuid.startswith(prefix) else ""
+        if suffix.isdigit():
+            last_no = max(last_no, int(suffix))
+
+    for row in doc.items:
+        if not row.item_uuid:
+            last_no += 1
+            row.item_uuid = f"{prefix}{last_no:03d}"
+
+
 class GatePass(Document):
     def before_insert(self):
         # A duplicated Gate Pass must not inherit the source's row identities,
@@ -41,7 +164,7 @@ class GatePass(Document):
                     row.adjusted_qty = 0
 
     def before_save(self):
-        self.set_item_uuids()
+        set_item_uuids(self)
 
         old_rows = {}
 
@@ -91,32 +214,6 @@ class GatePass(Document):
                 row.adjusted_qty = 0
                 row.pending_qty = row.qty
 
-    def set_item_uuids(self):
-        """Give every row a unique item_uuid of the form `<name>-NNN`.
-
-        Numbers continue after the highest one already used in this document
-        (instead of using the row idx), so deleting and re-adding rows can
-        never produce two rows with the same uuid.
-        """
-        prefix = f"{self.name}-"
-        seen = set()
-        last_no = 0
-
-        for row in self.items:
-            if not row.item_uuid or row.item_uuid in seen:
-                row.item_uuid = None
-                continue
-
-            seen.add(row.item_uuid)
-            suffix = row.item_uuid[len(prefix):] if row.item_uuid.startswith(prefix) else ""
-            if suffix.isdigit():
-                last_no = max(last_no, int(suffix))
-
-        for row in self.items:
-            if not row.item_uuid:
-                last_no += 1
-                row.item_uuid = f"{prefix}{last_no:03d}"
-
     def on_submit(self):
         self.update_return_qty(1)
 
@@ -150,9 +247,12 @@ class GatePass(Document):
                     AND gpi.return_reference IN %(uuids)s
             """, {"name": self.name, "uuids": tuple(item_uuids)}, as_dict=True)
 
-        # Adjustments point at the Gate Pass by name and at the row by item_uuid.
-        # The uuid survives amendments, so an adjustment made on GP-1 still
-        # counts against GP-1-1 and must block cancelling it.
+        # Adjustment rows reference the original row the same way returns do:
+        # `return_reference` = original item_uuid. The uuid survives amendments,
+        # so an adjustment made on GP-1 still blocks cancelling GP-1-1.
+        # The last two conditions match rows saved before the
+        # `adjustment_row_reference` patch (return_reference = Gate Pass name,
+        # item_uuid = original uuid); they match nothing once it has run.
         references += frappe.db.sql("""
             SELECT DISTINCT 'Gate Pass Adjustment' AS doctype, gpa.name, gpa.docstatus
             FROM `tabGate Pass Adjustment` gpa
@@ -163,6 +263,7 @@ class GatePass(Document):
                 gpa.docstatus < 2
                 AND (
                     gpa.gate_pass = %(name)s
+                    OR gpi.return_reference IN %(uuids)s
                     OR gpi.return_reference = %(name)s
                     OR gpi.item_uuid IN %(uuids)s
                 )
@@ -193,9 +294,7 @@ class GatePass(Document):
             original = get_original_item(row.return_reference)
 
             if not original:
-                if multiplier < 0:
-                    # The original was cancelled earlier (before cancellation
-                    # was blocked); nothing left to reverse.
+                if skip_missing_original(row.return_reference, multiplier):
                     continue
                 frappe.throw(_("Original item not found: {0}").format(row.return_reference))
 
