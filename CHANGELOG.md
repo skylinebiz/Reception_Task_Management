@@ -2,6 +2,80 @@
 
 All notable changes to Reception Tasks Management are documented here.
 
+## [6.0.0] - 2026-11-23
+
+This release was first pushed as 5.3.0 (commit `f8663f1`) and renumbered 6.0.0. It is a major
+version because it adds a Gate Pass Item field, changes how Gate Pass Adjustment rows store their
+reference, and rejects documents that 5.x accepted: cancelling a referenced Gate Pass, invalid
+return references, zero or negative return qty, and adjustments above pending qty. There is no
+separate 5.3.0 release. Patches keep their names, so on a site that already migrated an earlier
+6.0.0 build only the patches it has not run yet will run.
+
+### Added
+- **Return Gate Pass** (`return_gate_pass`, read-only Link → Gate Pass) on Gate Pass Item. It is set
+  on save to the Gate Pass of the original row that `return_reference` points at, on return rows
+  and adjustment rows alike. Because the field is a Link, Frappe's **Cancel All Documents** dialog
+  now lists the return Gate Passes that reference a Gate Pass, as well as its adjustments, and
+  cancels them first.
+- New patch `set_return_gate_pass` (post model sync) fills the field on existing rows. A return
+  row resolves to the submitted Gate Pass that holds its uuid now (the amended one, after an
+  amendment), falling back to the latest Gate Pass that held it.
+- New patch `adjustment_row_reference` (post model sync) converts existing Gate Pass Adjustment
+  rows to the new format (see Changed). It only touches rows still in the old format, so running it
+  again changes nothing.
+
+### Fixed
+- **A referenced Gate Pass could be cancelled.** Cancelling is now blocked while a draft or
+  submitted return Gate Pass or Gate Pass Adjustment references it (by Gate Pass name or by row
+  uuid, so references made before an amendment count too). The message lists each document with a
+  link and marks it Draft or Submitted.
+- **Duplicating a Gate Pass copied its row uuids**, so two submitted passes could share one and a
+  return could be booked against the wrong one. A duplicate now gets fresh uuids; amendments still
+  keep theirs.
+- **Two rows in one Gate Pass could get the same uuid** after deleting and re-adding rows. New rows
+  are now numbered after the highest number already used in the document.
+- **Gate Pass Adjustment updated the cancelled row after an amendment.** It now finds the original
+  row by its uuid on the submitted Gate Pass, like returns do.
+- **Cancelling a return or adjustment whose original Gate Pass was already cancelled** failed with
+  "Original item not found". That row is now skipped, so these documents can be cancelled. A cancel
+  skips a row only in that case: if the reference matches no Gate Pass row at all, the cancel fails
+  with an error and the quantities are left alone. (An earlier 6.0.0 build skipped such rows
+  silently, so an adjustment cancelled on a server still running pre-patch code left the original's
+  adjusted qty in place and the item never came back in Get Returnable Items.)
+
+### Changed
+- **Gate Pass Adjustment rows now reference the original row the same way return rows do.**
+  `return_reference` holds the original Gate Pass Item's `item_uuid` (it held the Gate Pass name),
+  `item_uuid` is the row's own uuid, e.g. `GP-ADJ-2026-00008-001` (it was a copy of the original
+  row's uuid), and `return_gate_pass` holds the Gate Pass name. An `item_uuid` is now unique across
+  Gate Pass Item, except that an amended Gate Pass keeps the uuids of the rows it replaces, and one
+  rule (`return_reference` = original uuid) finds every return and adjustment made against a row.
+  Rows in the old format are still read correctly until `adjustment_row_reference` has run, and an
+  adjustment saved from a browser still running the old form script is converted on insert.
+- **Return rows are checked on save as well as submit:** the referenced row must be on a submitted
+  Gate Pass, be returnable, be in the opposite direction and be in the same company, and a Gate
+  Pass cannot return its own items. A return row cannot itself be marked returnable.
+- **Qty:** negative qty is rejected on every row; returnable and return rows need qty greater
+  than 0.
+- **Gate Pass Adjustment:** only returnable rows of a submitted Gate Pass can be adjusted, and every
+  row must belong to the adjustment's Gate Pass. Adjusted qty cannot be negative or more than the
+  pending qty (qty − returned − already adjusted). Pending qty is now calculated after the adjusted
+  qty is clamped at 0.
+- **Amending a Gate Pass** cannot reduce a row's qty below its returned + adjusted qty.
+- `get_gate_pass_items` (adjustment item fetch) returns nothing for a draft or cancelled Gate Pass,
+  and only Gate Pass rows.
+- `get_pending_return_items` ("Get Returnable Items") leaves out return rows and adjustment rows,
+  matching the Returnable Items report.
+
+### Upgrade notes
+- Run `bench --site <site> migrate` (new field and patches), then restart the bench and
+  hard-refresh browsers so the server and the Gate Pass Adjustment form script use the new code.
+  Don't submit or cancel Gate Passes or adjustments between the migrate and the restart: the old
+  code still running does not understand the new adjustment rows.
+- No role has Cancel or Amend permission on Gate Pass Adjustment, so the Cancel All Documents dialog
+  will not offer "Cancel All" when an adjustment is listed. Grant those permissions to the roles that
+  need them.
+
 ## [5.2.0] - 2026-11-19
 
 ### Changed

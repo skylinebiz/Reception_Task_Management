@@ -17,6 +17,7 @@
   "adjusted_qty",
   "item_uuid",
   "return_reference",
+  "return_gate_pass",
   "return_qty",
   "pending_qty"
  ],
@@ -52,10 +53,20 @@
    "read_only": 1
   },
   {
+   "description": "Original Gate Pass Item reference",
    "fieldname": "return_reference",
    "fieldtype": "Data",
    "label": "Return Reference",
    "read_only": 1
+  },
+  {
+   "description": "Gate Pass of the original row (set from Return Reference).",
+   "fieldname": "return_gate_pass",
+   "fieldtype": "Link",
+   "label": "Return Gate Pass",
+   "options": "Gate Pass",
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "default": "0",
@@ -94,8 +105,9 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
+ "link_display_mode": "Search",
  "links": [],
- "modified": "2026-10-14 14:59:18.786650",
+ "modified": "2026-11-24 11:22:50.970171",
  "modified_by": "Administrator",
  "module": "Reception Tasks Management",
  "name": "Gate Pass Item",
